@@ -36,3 +36,19 @@ class PhoneNumber(models.Model):
     def __str__(self):
         return self.phone_number.as_e164
 
+class CustomUser(AbstractUser):
+    first_name = models.CharField(max_length=30, blank=False, null=False)
+    last_name = models.CharField(max_length=30, blank=False, null=False)
+    date_of_birth = models.DateField()
+    phone_number = models.OneToOneField(PhoneNumber, related_name="user", on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, related_name='user', on_delete=models.SET_NULL, null=True)
+
+    # provide unique relate_name for groups and user_permissions
+    groups = models.ManyToManyField(Group, related_name='custom_group')
+    user_permissions = models.ManyToManyField(Permission, related_name='custom_permissions')
+
+    def __str__(self):
+        return f"user: {self.get_full_name} @{self.username}"
+
+
+

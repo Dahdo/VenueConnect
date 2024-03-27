@@ -51,4 +51,36 @@ class CustomUser(AbstractUser):
         return f"user: {self.get_full_name} @{self.username}"
 
 
+class Profile(models.Model):
+    LANGUAGES_SPOKEN = [
+        ('en', 'English'),
+        ('pl', 'Polish'),
+        ('de', 'German'),
+        ('fr', 'French'),
+    ]
+    user = models.OneToOneField(CustomUser, related_name='profile', on_delete=models.CASCADE)
+    bio = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatar', blank=True, null=True)
+    languages_spoken = models.CharField(max_length=20, choices=LANGUAGES_SPOKEN, default='en')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ("-created_at",)
+    
+    def __str__(self):
+        return f"profile: {self.user.get_full_name} @{self.username}"
+
+    @property
+    def profile_pic_url(self):
+        try:
+            url = self.profile_pic.url
+        except:
+            url = ''
+        return url
+
+    # Signal to create a UserProfile instance once a CustomUser instance is created
+    @receiver(post_save, sender=CustomUser)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)

@@ -21,4 +21,18 @@ class Address(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+    
+
+class PhoneNumber(models.Model):
+    phone_number = PhoneNumberField(unique=True)
+    is_verified = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.phone_number.as_e164
 

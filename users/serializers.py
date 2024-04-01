@@ -40,3 +40,29 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    phone_number = PhoneNumberSerializer()
+    class Meta:
+        model = CustomUser
+        fields = ['username','password', 'first_name', 'last_name', 'phone_number', 'email']
+        depth = 1
+
+    def create(self, validated_data):
+        phone_number_data = validated_data.pop('phone_number')
+        username_data = validated_data.pop('username')
+        password_data = validated_data.pop('password')
+        first_name_data = validated_data.pop('first_name')
+        last_name_data = validated_data.pop('last_name')
+        email_data = validated_data.pop('email')
+
+
+        # Create PhoneNumber object associated with the user
+        phone_number_obj = PhoneNumber.objects.create(**phone_number_data)
+
+        user = CustomUser.objects.create(username=username_data, first_name=first_name_data, last_name=last_name_data
+                                         , email=email_data, phone_number = phone_number_obj)
+        user.set_password(password_data)
+        user.save()
+        return user
+

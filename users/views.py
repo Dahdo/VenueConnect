@@ -55,4 +55,37 @@ class ProfileViewSet(viewsets.ViewSet):
 
 
 
+class RegistrationViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
 
+    def create(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            # Ensure that the username is provided and non-empty
+            if not serializer.validated_data.get('username'):
+                return Response({'error': 'Username is required'}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class LoginViewSet(viewsets.ViewSet):
+    def create(self, request):
+        user = authenticate(username=request.data['username'], password=request.data['password'])
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key})
+        else:
+            return Response({'error': 'Invalid credentials'}, status=401)
+
+
+class LogoutViewSet(viewsets.ViewSet):
+    def create(self, request):
+        token = request.headers.get('Authorization').split()[1]
+        try:
+            Token.objects.get(key=token).delete()
+            return Response({'success': 'User logged out successfully'}, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)

@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-ronz*&0zfhi5y5f-+3hfpm&ae+z_n+t4q0!l+gua-wfv#oey(m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third party apps
     'phonenumber_field',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'drf_yasg',
     # Local apps
     'users',
 ]
@@ -121,3 +124,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # For meadia 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
+
+AUTH_USER_MODEL = "users.CustomUser"
+
+# DRF
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        }
+    }
+}

@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-ronz*&0zfhi5y5f-+3hfpm&ae+z_n+t4q0!l+gua-wfv#oey(m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'venue-connect-092139c4b592.herokuapp.com']
 
 
 # Application definition

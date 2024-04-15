@@ -154,6 +154,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CORS_ALLOWED_ORIGINS = [
-    '127.0.0.1',
-    'venue-connect-092139c4b592.herokuapp.com'
+    'http://127.0.0.1',
+    'https://venue-connect-092139c4b592.herokuapp.com'
 ]

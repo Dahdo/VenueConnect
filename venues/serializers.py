@@ -6,26 +6,24 @@ from users.serializers import CustomUserSerializer
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
-        fields = ['name', 'description', 'price', 'pricing_unit',
-                   'capacity', 'rating', 'rating_count', 'available', 'owner_name', 'owner_phone', 'owner_email', 'picture_url', 'latitude', 'longitude']
-        read_only_fields = ['owner_name', 'owner_phone', 'owner_email', 'picture_url']
+        fields = ['id', 'name', 'description', 'price', 'pricing_unit',
+                   'capacity', 'rating', 'available', 'picture_url', 'latitude', 'longitude']
+        read_only_fields = ['picture_url']
     
     def create(self, validated_data):
-        name_data = validated_data.pop('name')
-        description_data = validated_data.pop('description')
-        price_data = validated_data.pop('price')
+        name_data = validated_data.pop('name', "")
+        description_data = validated_data.pop('description', "")
+        price_data = validated_data.pop('price', None)
         pricing_unit_data = validated_data.pop('pricing_unit')
-        capacity_data = validated_data.pop('capacity')
+        capacity_data = validated_data.pop('capacity', None)
         rating_data = validated_data.pop('rating')
-        rating_count_data = validated_data.pop('rating_count')
         available_data = validated_data.pop('available')
-        rating_data = validated_data.pop('rating')
-        latitude_data = validated_data.pop('latitude')
-        longitude_data = validated_data.pop('longitude')
+        latitude_data = validated_data.pop('latitude', None)
+        longitude_data = validated_data.pop('longitude', None)
 
-        venue = CustomUser.objects.create(name=name_data, description=description_data, price=price_data, 
+        venue = Venue.objects.create(name=name_data, description=description_data, price=price_data, 
                                           pricing_unit=pricing_unit_data,capacity=capacity_data, rating=rating_data, 
-                                          rating_count=rating_count_data,available=available_data, latitude= latitude_data, longitude=longitude_data)
+                                          available=available_data, latitude= latitude_data, longitude=longitude_data)
         venue.save()
         return venue
     

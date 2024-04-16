@@ -45,7 +45,7 @@ class Venue(models.Model):
     @property
     def picture_url(self):
         try:
-            url = self.avatar.url
+            url = 'https://ibb.co/LJMnZN0' #self.picture.url
         except:
             url = ''
         return url

@@ -41,7 +41,7 @@ class Profile(models.Model):
     @property
     def avatar_url(self):
         try:
-            url = self.avatar.url
+            url = 'https://robohash.org/sza' # self.avatar.url
         except:
             url = ''
         return url

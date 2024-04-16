@@ -5,7 +5,7 @@ from .models import CustomUser, Profile
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'phone_number', 'email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'email']
     
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username','password', 'first_name', 'last_name', 'phone_number', 'email']
+        fields = ['id', 'username','password', 'first_name', 'last_name', 'phone_number', 'email']
 
     def create(self, validated_data):
         phone_number_data = validated_data.pop('phone_number')

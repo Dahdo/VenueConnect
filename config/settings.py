@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -69,18 +70,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
+if IS_HEROKU_APP:
+    DATABASES = {
+        "default": dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        ),
+    }
+else:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd9hu7bm4lok99a',
-        'USER': 'rskdwcbbrdrjqk',
-        'PASSWORD': '3fc69fbeeefb230e67923df63f6e038b6cf8abee973af8b4449cb3f35a93a0e2',
-        'HOST': 'ec2-44-213-151-75.compute-1.amazonaws.com',
-        'PORT': '5432',
+        'NAME': 'venueconnect',
+        'USER': 'vcadmin',
+        'PASSWORD': 'venueconnect@2024',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 

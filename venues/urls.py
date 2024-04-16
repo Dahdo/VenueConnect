@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register(r'venues', views.ProfileViewSet, basename='venue')
+router.register(r'', views.VenueViewset, basename='venue')
 
 urlpatterns = [
     path('', include(router.urls)),

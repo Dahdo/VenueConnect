@@ -60,5 +60,5 @@ class VenueViewset(viewsets.ViewSet):
         venue = self.get_object(pk)
         # self.check_object_permissions(request, venue) # Enforce object level permissions checking
         # Deleting the associated user deletes the profile automatically
-        venue.user.delete()
+        venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

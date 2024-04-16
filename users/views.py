@@ -9,9 +9,14 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from users.serializers import UserRegistrationSerializer
 from rest_framework import viewsets
+from users.permissions import UserPermissions
+from rest_framework.authentication import TokenAuthentication
 
 
 class ProfileViewSet(viewsets.ViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [UserPermissions]
+    
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk).profile # Get the profile associated with the user pk
@@ -27,11 +32,13 @@ class ProfileViewSet(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         profile = self.get_object(pk)
+        self.check_object_permissions(request, profile) # Enforce object level permissions checking
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         profile = self.get_object(pk)
+        self.check_object_permissions(request, profile) # Enforce object level permissions checking
         serializer = ProfileSerializer(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -40,6 +47,7 @@ class ProfileViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         profile = self.get_object(pk)
+        self.check_object_permissions(request, profile) # Enforce object level permissions checking
         serializer = ProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -48,6 +56,7 @@ class ProfileViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         profile = self.get_object(pk)
+        self.check_object_permissions(request, profile) # Enforce object level permissions checking
         # Deleting the associated user deletes the profile automatically
         profile.user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -72,6 +81,7 @@ class RegistrationViewSet(viewsets.ViewSet):
 
 
 class LoginViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
     def create(self, request):
         user = authenticate(username=request.data['username'], password=request.data['password'])
         if user:
@@ -82,6 +92,7 @@ class LoginViewSet(viewsets.ViewSet):
 
 
 class LogoutViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     def create(self, request):
         token = request.headers.get('Authorization').split()[1]
         try:

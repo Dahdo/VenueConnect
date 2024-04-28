@@ -10,22 +10,28 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer()
+
     class Meta:
         model = Profile
-        fields = ['user', 'avatar_url', 'bio', 'languages_spoken']
-        read_only_fields = ['avatar_url']
-
+        fields = ['user', 'avatar', 'bio', 'languages_spoken']
 
     def update(self, instance, validated_data):
-        # Update fields of the main model instance
-        instance.user.username = validated_data.get('username', instance.user.username)
-        instance.user.first_name = validated_data.get('first_name', instance.user.first_name)
-        instance.user.last_name = validated_data.get('last_name', instance.user.last_name)
-        instance.user.email = validated_data.get('email', instance.user.email)
-        instance.user.phone_number = validated_data.get('phone_number', instance.user.phone_number)
+        # Update fields of the embedded user model
+        user_data = validated_data.pop('user', {})
+        user = instance.user
+        user.username = user_data.get('username', user.username)
+        user.first_name = user_data.get('first_name', user.first_name)
+        user.last_name = user_data.get('last_name', user.last_name)
+        user.email = user_data.get('email', user.email)
+        user.phone_number = user_data.get('phone_number', user.phone_number)
+        user.save()
 
-        instance.user.save()
+        # Update fields of the main model
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.bio = validated_data.get('bio', instance.bio)
+        instance.languages_spoken = validated_data.get('languages_spoken', instance.languages_spoken)
         instance.save()
+
         return instance
 
 

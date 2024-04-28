@@ -11,11 +11,13 @@ from users.serializers import UserRegistrationSerializer
 from rest_framework import viewsets
 from users.permissions import UserPermissions
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class ProfileViewSet(viewsets.ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [UserPermissions]
+    parser_classes = (MultiPartParser, FormParser)
     
     def get_object(self, pk):
         try:

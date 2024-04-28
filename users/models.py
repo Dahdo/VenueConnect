@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 import os
+from datetime import datetime
 
 class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=30, blank=True, null=True)
@@ -48,3 +49,12 @@ class Profile(models.Model):
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
             Profile.objects.create(user=instance)
+
+
+
+@receiver(pre_save, sender=Profile)
+def update_avatar_filename(sender, instance, **kwargs):
+    if instance.avatar:  # Check if the new avatar exists
+        old_avatar = Profile.objects.get(pk=instance.pk).avatar
+        if old_avatar:  # Check if old avatar exists
+            old_avatar.delete(save=False)  # Delete old avatar file

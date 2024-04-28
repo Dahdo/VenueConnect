@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from venues.models import CustomUser, Venue
-from users.serializers import CustomUserSerializer
+from venues.models import Venue
 
 
 class VenueSerializer(serializers.ModelSerializer):

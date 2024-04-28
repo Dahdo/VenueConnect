@@ -4,7 +4,6 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 import os
-from datetime import datetime
 
 class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=30, blank=True, null=True)

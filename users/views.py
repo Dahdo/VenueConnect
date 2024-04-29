@@ -27,7 +27,7 @@ class ProfileViewSet(viewsets.ViewSet):
         
     def list(self, request):
         profiles = Profile.objects.all()
-        serializer = ProfileSerializer(profiles, many=True)
+        serializer = ProfileSerializer(profiles, context={'request': request}, many=True)
         return Response(serializer.data)
     
     # No Post method needed since for each user created, an associated profile is created automatically
@@ -35,13 +35,13 @@ class ProfileViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         profile = self.get_object(pk)
         self.check_object_permissions(request, profile) # Enforce object level permissions checking
-        serializer = ProfileSerializer(profile)
+        serializer = ProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         profile = self.get_object(pk)
         self.check_object_permissions(request, profile) # Enforce object level permissions checking
-        serializer = ProfileSerializer(profile, data=request.data)
+        serializer = ProfileSerializer(profile, context={'request': request}, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -50,7 +50,7 @@ class ProfileViewSet(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         profile = self.get_object(pk)
         self.check_object_permissions(request, profile) # Enforce object level permissions checking
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        serializer = ProfileSerializer(profile,context={'request': request}, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -21,10 +21,18 @@ class ProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name')
     phone_number = serializers.CharField(source='user.phone_number')
     email = serializers.EmailField(source='user.email')
+    avatar = serializers.SerializerMethodField() 
 
     class Meta:
         model = Profile
         fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'email', 'avatar', 'bio', 'languages_spoken']
+    
+
+    def get_avatar(self, profile):
+        request = self.context.get('request')
+        if profile.avatar:
+            return request.build_absolute_uri(profile.avatar.url)
+        return None
 
 
     def validate_username(self, value):

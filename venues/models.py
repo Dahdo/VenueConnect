@@ -1,5 +1,7 @@
 from django.db import models
 from users.models import CustomUser
+from uuid import uuid4
+import os
 
 class Address(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True)
@@ -21,9 +23,11 @@ class Address(models.Model):
 
 class Venue(models.Model):
     PRICING_CHOICES = (
+        ('hour', 'Per Hour'),
         ('day', 'Per Day'),
         ('week', 'Per Week'),
         ('month', 'Per Month'),
+        ('year', 'Per Year')
     )
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(blank=True, null=True)
@@ -33,7 +37,7 @@ class Venue(models.Model):
     capacity = models.IntegerField()
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5)
     rating_count = models.IntegerField(null=True, blank=True)
-    picture = models.ImageField(upload_to='venue', blank=True, null=True)
+    # picture = models.ImageField(upload_to='venue', blank=True, null=True)
     available = models.BooleanField(default=True)
     # address = models.ForeignKey(Address, related_name='venue', on_delete=models.NULL)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -49,3 +53,12 @@ class Venue(models.Model):
         except:
             url = ''
         return url
+    
+def image_upload_to(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"venue_{instance.venue.id}_{uuid4()}.{ext}"
+    return os.path.join('venues', filename)
+
+class VenueImages(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to=image_upload_to)

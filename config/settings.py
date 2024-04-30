@@ -178,6 +178,6 @@ AWS_S3_ENDPOINT_URL = cloudcube_base_url
 AWS_ACCESS_KEY_ID = os.environ.get('CLOUDCUBE_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('CLOUDCUBE_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = cloudcube_bucket
-AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'private')
+AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'public-read')
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_SIGNATURE_VERSION = "s3v4"

@@ -21,7 +21,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source='user.last_name')
     phone_number = serializers.CharField(source='user.phone_number')
     email = serializers.EmailField(source='user.email')
-    avatar = serializers.SerializerMethodField() 
 
     class Meta:
         model = Profile

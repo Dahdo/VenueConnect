@@ -22,12 +22,12 @@ class VenueViewset(viewsets.ViewSet):
             raise Http404
         
     def list(self, request):
-        venue = Venue.objects.all()
-        serializer = VenueSerializer(venue, many=True)
+        venues = Venue.objects.all()
+        serializer = VenueSerializer(venues, many=True, context={'request': request})
         return Response(serializer.data)
     
     def create(self, request):
-        serializer = VenueSerializer(data=request.data)
+        serializer = VenueSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -37,13 +37,13 @@ class VenueViewset(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         venue = self.get_object(pk)
         # self.check_object_permissions(request, venue) # Enforce object level permissions checking
-        serializer = VenueSerializer(venue)
+        serializer = VenueSerializer(venue, context={'request': request})
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         venue = self.get_object(pk)
         # self.check_object_permissions(request, venue) # Enforce object level permissions checking
-        serializer = VenueSerializer(venue, data=request.data)
+        serializer = VenueSerializer(venue, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -52,7 +52,7 @@ class VenueViewset(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         venue = self.get_object(pk)
         # self.check_object_permissions(request, venue) # Enforce object level permissions checking
-        serializer = VenueSerializer(venue, data=request.data, partial=True)
+        serializer = VenueSerializer(venue, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

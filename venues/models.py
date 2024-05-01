@@ -59,6 +59,6 @@ def image_upload_to(instance, filename):
     filename = f"venue_{instance.venue.id}_{uuid4()}.{ext}"
     return os.path.join('venues', filename)
 
-# class VenueImages(models.Model):
-#     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name='images')
-#     image = models.ImageField(upload_to=image_upload_to)
+class VenueImages(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to=image_upload_to)

@@ -9,7 +9,7 @@ class VenueImagesSerializer(serializers.ModelSerializer):
 
 
 class VenueSerializer(serializers.ModelSerializer):
-    # images = VenueImagesSerializer(many=True, read_only=True)
+    images = VenueImagesSerializer(many=True, read_only=True)
     upload_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, write_only=True, use_url=False),
         required=False

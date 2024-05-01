@@ -1,15 +1,8 @@
 from rest_framework import serializers
 from venues.models import Venue, VenueImages
 
-
-class VenueImagesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VenueImages
-        fields = ['image']
-
-
 class VenueSerializer(serializers.ModelSerializer):
-    images = VenueImagesSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
     upload_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, write_only=True, use_url=False),
         required=False
@@ -18,6 +11,9 @@ class VenueSerializer(serializers.ModelSerializer):
         model = Venue
         fields = ['id', 'name', 'description', 'price', 'pricing_unit',
                    'capacity', 'rating', 'available','images','upload_images', 'latitude', 'longitude']
+        
+    def get_images(self, obj):
+        return [image.image.url for image in obj.images.all()]
     
     def create(self, validated_data):
         uploaded_images = validated_data.get('upload_images', [])

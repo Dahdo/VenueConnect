@@ -1,32 +1,39 @@
 from rest_framework import serializers
-from venues.models import Venue
+from venues.models import Venue, VenueImages
+
+
+class VenueImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueImages
+        fields = ['image']
 
 
 class VenueSerializer(serializers.ModelSerializer):
+    # images = VenueImagesSerializer(many=True, read_only=True)
+    upload_images = serializers.ListField(
+        child=serializers.ImageField(allow_empty_file=False, write_only=True, use_url=False),
+        required=False
+    )
     class Meta:
         model = Venue
         fields = ['id', 'name', 'description', 'price', 'pricing_unit',
-                   'capacity', 'rating', 'available', 'picture_url', 'latitude', 'longitude']
-        read_only_fields = ['picture_url']
+                   'capacity', 'rating', 'available','images','upload_images', 'latitude', 'longitude']
     
     def create(self, validated_data):
-        name_data = validated_data.pop('name', "")
-        description_data = validated_data.pop('description', "")
-        price_data = validated_data.pop('price', None)
-        pricing_unit_data = validated_data.pop('pricing_unit')
-        capacity_data = validated_data.pop('capacity', None)
-        rating_data = validated_data.pop('rating')
-        available_data = validated_data.pop('available')
-        latitude_data = validated_data.pop('latitude', None)
-        longitude_data = validated_data.pop('longitude', None)
-
-        venue = Venue.objects.create(name=name_data, description=description_data, price=price_data, 
-                                          pricing_unit=pricing_unit_data,capacity=capacity_data, rating=rating_data, 
-                                          available=available_data, latitude= latitude_data, longitude=longitude_data)
+        uploaded_images = validated_data.get('upload_images', [])
+        venue = Venue.objects.create(**validated_data)
         venue.save()
+        for image in uploaded_images:
+            VenueImages.objects.create(venue=venue, image=image)
         return venue
     
     def update(self, instance, validated_data):
+        if 'upload_images' in validated_data:
+            instance.images.all().delete() # Delete existing images
+            uploaded_images = validated_data.pop('upload_images')
+            for image in uploaded_images:
+                VenueImages.objects.create(venue=instance, image=image)
+
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.price = validated_data.get('price', instance.price)
@@ -38,6 +45,6 @@ class VenueSerializer(serializers.ModelSerializer):
         instance.rating = validated_data.get('rating', instance.rating)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.longitude = validated_data.get('longitude', instance.longitude)
-
         instance.save()
         return instance
+

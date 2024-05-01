@@ -7,11 +7,13 @@ from venues.serializers import VenueSerializer
 from rest_framework import viewsets
 from venues.models import Venue
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class VenueViewset(viewsets.ViewSet):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [UserPermissions]
+    parser_class = [MultiPartParser, FormParser]
     
     def get_object(self, pk):
         try:

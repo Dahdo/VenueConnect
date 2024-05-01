@@ -13,7 +13,8 @@ class VenueSerializer(serializers.ModelSerializer):
                    'capacity', 'rating', 'available','images','upload_images', 'latitude', 'longitude']
         
     def get_images(self, obj):
-        return [image.image.url for image in obj.images.all()]
+        request = self.context.get('request')
+        return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
     
     def create(self, validated_data):
         uploaded_images = validated_data.get('upload_images', [])

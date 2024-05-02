@@ -31,8 +31,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if profile.avatar:
             return request.build_absolute_uri(profile.avatar.url)
-        return None
-
+        else:
+            return 'https://cloud-cube-us2.s3.amazonaws.com/ok6a0dgosksq/public/placeholder.jpg'
+        
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Check if the avatar field is set
+        if not instance.avatar:
+            # If not set, assign the default avatar URL
+            request = self.context.get('request')
+            data['avatar'] = 'https://cloud-cube-us2.s3.amazonaws.com/ok6a0dgosksq/public/placeholder.jpg'
+        return data
 
     def validate_username(self, value):
         instance = self.instance 

@@ -8,11 +8,13 @@ from rest_framework import viewsets
 from venues.models import Venue
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
+from common.pagination import VenuesPagination
 
 
 class VenueViewset(viewsets.ViewSet):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [UserPermissions]
+    pagination_class = VenuesPagination
     parser_class = [MultiPartParser, FormParser]
     
     def get_object(self, pk):

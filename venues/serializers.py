@@ -10,7 +10,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = ['id', 'name', 'description', 'price', 'pricing_unit',
-                   'capacity', 'rating', 'available','images','upload_images', 'latitude', 'longitude']
+                   'capacity', 'rating', 'available_from', 'available_till','images','upload_images', 'latitude', 'longitude']
         
     def get_images(self, obj):
         request = self.context.get('request')
@@ -38,7 +38,8 @@ class VenueSerializer(serializers.ModelSerializer):
         instance.capacity = validated_data.get('capacity', instance.capacity)
         instance.rating = validated_data.get('rating', instance.rating)
         instance.rating_count = validated_data.get('rating_count', instance.rating_count)
-        instance.available = validated_data.get('available', instance.available)
+        instance.available_from = validated_data.get('available_from', instance.available_from)
+        instance.available_till = validated_data.get('available_till', instance.available_till)
         instance.rating = validated_data.get('rating', instance.rating)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.longitude = validated_data.get('longitude', instance.longitude)

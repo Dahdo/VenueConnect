@@ -37,22 +37,14 @@ class Venue(models.Model):
     capacity = models.IntegerField()
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5)
     rating_count = models.IntegerField(null=True, blank=True)
-    # picture = models.ImageField(upload_to='venue', blank=True, null=True)
-    available = models.BooleanField(default=True)
+    available_from = models.DateField(null=True, blank=True)
+    available_till = models.DateField(null=True, blank=True)
     # address = models.ForeignKey(Address, related_name='venue', on_delete=models.NULL)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    @property
-    def picture_url(self):
-        try:
-            url = 'https://ibb.co/LJMnZN0' #self.picture.url
-        except:
-            url = ''
-        return url
     
 def image_upload_to(instance, filename):
     ext = filename.split('.')[-1]

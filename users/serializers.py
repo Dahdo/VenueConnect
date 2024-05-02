@@ -31,8 +31,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if profile.avatar:
             return request.build_absolute_uri(profile.avatar.url)
-        return None
-
+        else:
+            return request.build_absolute_uri('/media/avatars/placeholder.jpg')
+        
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Check if the avatar field is set
+        if not instance.avatar:
+            # If not set, assign the default avatar URL
+            request = self.context.get('request')
+            data['avatar'] = request.build_absolute_uri('/media/avatars/placeholder.jpg')
+        return data
 
     def validate_username(self, value):
         instance = self.instance 

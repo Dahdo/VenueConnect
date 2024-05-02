@@ -6,15 +6,13 @@ from rest_framework.authtoken.models import Token
 from venues.serializers import VenueSerializer
 from rest_framework import viewsets
 from venues.models import Venue
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
-from common.pagination import VenuesPagination
+from rest_framework.pagination import PageNumberPagination
 
 
 class VenueViewset(viewsets.ViewSet):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [UserPermissions]
-    pagination_class = VenuesPagination
     parser_class = [MultiPartParser, FormParser]
     
     def get_object(self, pk):
@@ -22,11 +20,13 @@ class VenueViewset(viewsets.ViewSet):
             return Venue.objects.get(pk=pk)
         except Venue.DoesNotExist:
             raise Http404
-        
+    
     def list(self, request):
-        venues = Venue.objects.all()
+        paginator = PageNumberPagination()
+        paginator.page_size = 12
+        venues = paginator.paginate_queryset(Venue.objects.all(), request)
         serializer = VenueSerializer(venues, many=True, context={'request': request})
-        return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
     
     def create(self, request):
         serializer = VenueSerializer(data=request.data, context={'request': request})

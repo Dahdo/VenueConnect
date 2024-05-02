@@ -62,16 +62,26 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'venueconnect',
+#         'USER': 'vcadmin',
+#         'PASSWORD': 'venueconnect@2024',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'venueconnect',
-        'USER': 'vcadmin',
-        'PASSWORD': 'venueconnect@2024',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'dgmes10sn26bs',
+        'USER': 'qtcjyedwtcqhdk',
+        'PASSWORD': 'bfbb095427a307ac30a3f9b031cf2b6e9895378dd19b8b251af20c355b2e0e29',
+        'HOST': 'ec2-54-144-112-84.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
-}
 
 
 # Password validation

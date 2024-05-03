@@ -17,6 +17,6 @@ urlpatterns = [
     # Endpoint to mark a specific booking as completed
     path('bookings/<int:booking_id>/complete/', BookingCompleteView.as_view(), name='booking-complete'),
 
-    # Endpoint to delete a specific booking
+    # Endpoint to delete a specific booking (need to be an admin)
     path('bookings/<int:booking_id>/delete/', BookingDeleteView.as_view(), name='bookings-delete')
 ]

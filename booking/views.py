@@ -15,7 +15,7 @@ class UserBookingListView(APIView): # Get all for a specific user
         return Response(serializer.data)
     
 class BookingListView(APIView): # for all users
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bookings = Booking.objects.all()
@@ -32,6 +32,7 @@ class BookingListView(APIView): # for all users
 
 from django.http import Http404 
 class BookingDetailView(APIView):  # for a specific user and booking
+    permission_classes = [IsAuthenticated]
     def get(self, request, user_id, booking_id):
         try:
             booking = Booking.objects.get(user_id=user_id, id=booking_id)
@@ -76,7 +77,8 @@ class BookingCompleteView(APIView):
         return Response(serializer.data)
     
 class BookingDeleteView(APIView):
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
+    
     def delete(self, request, booking_id):
         booking = get_object_or_404(Booking, pk=booking_id)
         booking.delete()

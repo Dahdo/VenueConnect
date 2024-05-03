@@ -11,8 +11,8 @@ class Booking(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='bookings')
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name='bookings')
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default='active')
-    check_in = models.DateField()
-    check_out = models.DateField()
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
     review = models.TextField(blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5)
 

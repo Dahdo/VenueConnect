@@ -96,15 +96,10 @@ else:
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dgmes10sn26bs',
-        'USER': 'qtcjyedwtcqhdk',
-        'PASSWORD': 'bfbb095427a307ac30a3f9b031cf2b6e9895378dd19b8b251af20c355b2e0e29',
-        'HOST': 'ec2-54-144-112-84.compute-1.amazonaws.com',
-        'PORT': '5432',
-        'NAME': 'dgmes10sn26bs',
-        'USER': 'qtcjyedwtcqhdk',
-        'PASSWORD': 'bfbb095427a307ac30a3f9b031cf2b6e9895378dd19b8b251af20c355b2e0e29',
-        'HOST': 'ec2-54-144-112-84.compute-1.amazonaws.com',
+        'NAME': 'dc42s74vakki78',
+        'USER': 'onocxsivktdrrn',
+        'PASSWORD': '8b20d4c703ce98cd7c38ada6f1f2f2a04117efe16dc40bdb12d63cbb062fc82d',
+        'HOST': 'ec2-34-237-41-95.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }

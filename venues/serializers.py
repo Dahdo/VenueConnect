@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from venues.models import Venue, VenueImages, Address
+from venues.models import Venue, VenueImages, Address, VenueAvailability
+
+class VenueAvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VenueAvailability
+        fields = ['start_time', 'end_time']
 
 class VenueSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
@@ -13,11 +18,12 @@ class VenueSerializer(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='address.postal_code', allow_null=True)
     latitude = serializers.DecimalField(source='address.latitude', max_digits=9, decimal_places=6, allow_null=True)
     longitude = serializers.DecimalField(source='address.longitude', max_digits=9, decimal_places=6, allow_null=True)
+    availability = VenueAvailabilitySerializer(many=True)
 
     class Meta:
         model = Venue
         fields = ['id', 'name', 'description', 'price', 'pricing_unit',
-                   'capacity', 'rating', 'available_from', 'available_till','city', 'street', 
+                   'capacity', 'rating', 'availability', 'city', 'street', 
                    'postal_code', 'latitude', 'longitude', 'images','upload_images' ]
         
     def get_images(self, obj):
@@ -26,6 +32,7 @@ class VenueSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         address_data = validated_data.pop('address', None)
+        availability_data = validated_data.pop('availability', [])
         uploaded_images = validated_data.pop('upload_images', [])
 
         name_data = validated_data.pop('name')
@@ -34,14 +41,14 @@ class VenueSerializer(serializers.ModelSerializer):
         pricing_unit_data = validated_data.pop('pricing_unit')
         capacity_data = validated_data.pop('capacity')
         rating_data = validated_data.pop('rating')
-        available_from_data = validated_data.pop('available_from')
-        available_till_data = validated_data.pop('available_till')
         venue = Venue.objects.create(name=name_data, description=description_data, price=price_data,
-                                     pricing_unit=pricing_unit_data, capacity=capacity_data, rating=rating_data,
-                                     available_from=available_from_data, available_till=available_till_data)
+                                     pricing_unit=pricing_unit_data, capacity=capacity_data, rating=rating_data)
         venue.save()
         for image in uploaded_images:
             VenueImages.objects.create(venue=venue, image=image)
+
+        for availability in availability_data:
+            VenueAvailability.objects.create(venue=venue, start_time=availability['start_time'], end_time=availability['end_time'])
         
         if address_data:
             address = Address.objects.create(**address_data)
@@ -56,6 +63,13 @@ class VenueSerializer(serializers.ModelSerializer):
             uploaded_images = validated_data.pop('upload_images')
             for image in uploaded_images:
                 VenueImages.objects.create(venue=instance, image=image)
+        
+        if 'availability' in validated_data:
+            instance.availability.all().delete() # Delete existing availability times
+            availability_data = validated_data.pop('availability')
+            for availability in availability_data:
+                VenueAvailability.objects.create(venue=instance, start_time=availability['start_time'], end_time=availability['end_time'])
+
 
         address_data = validated_data.pop('address', None)
         address = instance.address
@@ -75,8 +89,6 @@ class VenueSerializer(serializers.ModelSerializer):
         instance.capacity = validated_data.get('capacity', instance.capacity)
         instance.rating = validated_data.get('rating', instance.rating)
         instance.rating_count = validated_data.get('rating_count', instance.rating_count)
-        instance.available_from = validated_data.get('available_from', instance.available_from)
-        instance.available_till = validated_data.get('available_till', instance.available_till)
         instance.rating = validated_data.get('rating', instance.rating)
         instance.save()
         return instance

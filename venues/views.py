@@ -87,14 +87,15 @@ class AvailabilityRangeFilterBackend(BaseFilterBackend):
         return queryset
 
 class VenueSearchFilter(viewsets.ViewSet):
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, AvailabilityRangeFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, AvailabilityRangeFilterBackend]
     filterset_fields = {
         'price': ['gte', 'lte'],
         'capacity': ['gte', 'lte'],
         'rating': ['gte'],
-        'address__city': ['iexact']
+        'address__city': ['exact']
     }
-    search_fields = ['name', 'description', 'city']
+    search_fields = ['name', 'description', 'address__city']
+    ordering_fields = ['price']
 
     def filter_queryset(self, queryset):
         for backend in list(self.filter_backends):

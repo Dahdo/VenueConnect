@@ -12,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.filters import BaseFilterBackend
 from datetime import datetime
-
+from django.db.models import Q
 
 class AvailabilityRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -23,10 +23,11 @@ class AvailabilityRangeFilterBackend(BaseFilterBackend):
             start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
             end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
             queryset = queryset.filter(
-                availability__start_time__lte=start_datetime,
-                availability__end_time__gte=end_datetime
+                ~Q(availability__start_time__lte=start_datetime, Availability__end_time__lte=end_datetime) |
+                ~Q(availability__start_time__gte=start_datetime, Availability__end_time__gte=end_datetime) |
+                ~Q(availability__start_time__lte=start_datetime, Availability__end_time__gte=end_datetime) 
             )
-        
+
         return queryset
 
 class VenueViewset(viewsets.ViewSet):

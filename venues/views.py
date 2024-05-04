@@ -14,10 +14,42 @@ from rest_framework.filters import BaseFilterBackend
 from datetime import datetime
 
 
+class AvailabilityRangeFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        start_time = request.query_params.get('start_time')
+        end_time = request.query_params.get('end_time')
+
+        if start_time and end_time:
+            start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+            end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
+            queryset = queryset.filter(
+                availability__start_time__lte=start_datetime,
+                availability__end_time__gte=end_datetime
+            )
+        
+        return queryset
+
 class VenueViewset(viewsets.ViewSet):
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [UserPermissions]
     parser_class = [MultiPartParser, FormParser]
+
+    # For filter/search
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, AvailabilityRangeFilterBackend]
+    filterset_fields = {
+        'price': ['gte', 'lte'],
+        'capacity': ['gte', 'lte'],
+        'rating': ['gte'],
+        'address__city': ['exact']
+    }
+    search_fields = ['name', 'description', 'address__city']
+    ordering_fields = ['price', 'rating']
+
+    
+    def filter_queryset(self, queryset):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
     
     def get_object(self, pk):
         try:
@@ -26,10 +58,15 @@ class VenueViewset(viewsets.ViewSet):
             raise Http404
     
     def list(self, request):
+        # Check if there are any query parameters
+        if not request.query_params:
+            venues = Venue.objects.all()
+        else:
+            venues = self.filter_queryset(Venue.objects.all())
         paginator = PageNumberPagination()
         paginator.page_size = 12
-        venues = paginator.paginate_queryset(Venue.objects.all(), request)
-        serializer = VenueSerializer(venues, many=True, context={'request': request})
+        venues_page = paginator.paginate_queryset(venues, request)
+        serializer = VenueSerializer(venues_page, context={'request': request}, many=True)
         return paginator.get_paginated_response(serializer.data)
     
     def create(self, request):
@@ -70,46 +107,3 @@ class VenueViewset(viewsets.ViewSet):
         # Deleting the associated user deletes the profile automatically
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class AvailabilityRangeFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        start_time = request.query_params.get('start_time')
-        end_time = request.query_params.get('end_time')
-
-        if start_time and end_time:
-            start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-            end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
-            queryset = queryset.filter(
-                availability__start_time__lte=start_datetime,
-                availability__end_time__gte=end_datetime
-            )
-        
-        return queryset
-
-class VenueSearchFilter(viewsets.ViewSet):
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, AvailabilityRangeFilterBackend]
-    filterset_fields = {
-        'price': ['gte', 'lte'],
-        'capacity': ['gte', 'lte'],
-        'rating': ['gte'],
-        'address__city': ['exact']
-    }
-    search_fields = ['name', 'description', 'address__city']
-    ordering_fields = ['price']
-
-    def filter_queryset(self, queryset):
-        for backend in list(self.filter_backends):
-            queryset = backend().filter_queryset(self.request, queryset, self)
-        return queryset
-    
-    def list(self, request):
-        # Check if there are any query parameters
-        if not request.query_params:
-            venues = Venue.objects.all()
-        else:
-            venues = self.filter_queryset(Venue.objects.all())
-        paginator = PageNumberPagination()
-        paginator.page_size = 12
-        venues_page = paginator.paginate_queryset(venues, request)
-        serializer = VenueSerializer(venues_page, context={'request': request}, many=True)
-        return paginator.get_paginated_response(serializer.data)

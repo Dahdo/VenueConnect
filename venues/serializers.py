@@ -1,13 +1,11 @@
 from rest_framework import serializers
-from venues.models import Venue, VenueImages, Address, VenueAvailability
-
-class VenueAvailabilitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VenueAvailability
-        fields = ['start_time', 'end_time']
+from venues.models import Venue, VenueImages, Address
+from booking.serializers import BookingsSerializer
+from booking.models import Bookings
 
 class VenueSerializer(serializers.ModelSerializer):
-    images = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField(read_only=True)
+    bookings = serializers.SerializerMethodField(read_only=True)
     upload_images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, write_only=True, use_url=False),
         required=False
@@ -18,21 +16,23 @@ class VenueSerializer(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='address.postal_code', allow_null=True)
     latitude = serializers.DecimalField(source='address.latitude', max_digits=9, decimal_places=6, allow_null=True)
     longitude = serializers.DecimalField(source='address.longitude', max_digits=9, decimal_places=6, allow_null=True)
-    availability = VenueAvailabilitySerializer(many=True)
 
     class Meta:
         model = Venue
         fields = ['id', 'name', 'description', 'price', 'pricing_unit',
-                   'capacity', 'rating', 'availability', 'city', 'street', 
+                   'capacity', 'rating', 'bookings', 'city', 'street', 
                    'postal_code', 'latitude', 'longitude', 'images','upload_images' ]
         
     def get_images(self, obj):
         request = self.context.get('request')
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
+
+    def get_bookings(self, obj):
+        return [{"check_in": booking.check_in, "check_out": booking.check_out} for booking in obj.bookings.all()]
+
     
     def create(self, validated_data):
         address_data = validated_data.pop('address', None)
-        availability_data = validated_data.pop('availability', [])
         uploaded_images = validated_data.pop('upload_images', [])
 
         name_data = validated_data.pop('name')
@@ -47,9 +47,6 @@ class VenueSerializer(serializers.ModelSerializer):
         for image in uploaded_images:
             VenueImages.objects.create(venue=venue, image=image)
 
-        for availability in availability_data:
-            VenueAvailability.objects.create(venue=venue, start_time=availability['start_time'], end_time=availability['end_time'])
-        
         if address_data:
             address = Address.objects.create(**address_data)
             venue.address = address
@@ -63,13 +60,6 @@ class VenueSerializer(serializers.ModelSerializer):
             uploaded_images = validated_data.pop('upload_images')
             for image in uploaded_images:
                 VenueImages.objects.create(venue=instance, image=image)
-        
-        if 'availability' in validated_data:
-            instance.availability.all().delete() # Delete existing availability times
-            availability_data = validated_data.pop('availability')
-            for availability in availability_data:
-                VenueAvailability.objects.create(venue=instance, start_time=availability['start_time'], end_time=availability['end_time'])
-
 
         address_data = validated_data.pop('address', None)
         address = instance.address

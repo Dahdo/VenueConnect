@@ -23,9 +23,9 @@ class AvailabilityRangeFilterBackend(BaseFilterBackend):
             start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
             end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
             queryset = queryset.filter(
-                ~Q(availability__start_time__lte=start_datetime, Availability__end_time__lte=end_datetime) |
-                ~Q(availability__start_time__gte=start_datetime, Availability__end_time__gte=end_datetime) |
-                ~Q(availability__start_time__lte=start_datetime, Availability__end_time__gte=end_datetime) 
+                ~Q(availability__start_time__lte=start_datetime, availability__end_time__lte=end_datetime) |
+                ~Q(availability__start_time__gte=start_datetime, availability__end_time__gte=end_datetime) |
+                ~Q(availability__start_time__lte=start_datetime, availability__end_time__gte=end_datetime) 
             )
 
         return queryset

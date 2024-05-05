@@ -2,7 +2,7 @@ from django.db import models
 from users.models import CustomUser
 from venues.models import Venue
 
-class Booking(models.Model):
+class Bookings(models.Model):
     STATE_CHOICES = (
         ('active', 'Active'),
         ('cancelled', 'Cancelled'),

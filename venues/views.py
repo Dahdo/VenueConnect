@@ -14,7 +14,7 @@ from rest_framework.filters import BaseFilterBackend
 from datetime import datetime
 from django.db.models import Q
 
-class AvailabilityRangeFilterBackend(BaseFilterBackend):
+class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         start_time = request.query_params.get('start_time')
         end_time = request.query_params.get('end_time')
@@ -23,9 +23,9 @@ class AvailabilityRangeFilterBackend(BaseFilterBackend):
             start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
             end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
             queryset = queryset.filter(
-                ~Q(availability__start_time__lte=start_datetime, availability__end_time__lte=end_datetime) |
-                ~Q(availability__start_time__gte=start_datetime, availability__end_time__gte=end_datetime) |
-                ~Q(availability__start_time__lte=start_datetime, availability__end_time__gte=end_datetime) 
+                ~Q(bookings__start_time__lte=start_datetime, bookings__end_time__lte=end_datetime) |
+                ~Q(bookings__start_time__gte=start_datetime, bookings__end_time__gte=end_datetime) |
+                ~Q(bookings__start_time__lte=start_datetime, bookings__end_time__gte=end_datetime) 
             )
 
         return queryset
@@ -36,7 +36,7 @@ class VenueViewset(viewsets.ViewSet):
     parser_class = [MultiPartParser, FormParser]
 
     # For filter/search
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, AvailabilityRangeFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, BookingsRangeFilterBackend]
     filterset_fields = {
         'price': ['gte', 'lte'],
         'capacity': ['gte', 'lte'],

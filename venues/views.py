@@ -1,8 +1,6 @@
 from rest_framework import status
 from django.http import Http404
 from rest_framework.response import Response
-from rest_framework import permissions
-from rest_framework.authtoken.models import Token
 from venues.serializers import VenueSerializer
 from rest_framework import viewsets
 from venues.models import Venue
@@ -13,6 +11,8 @@ from rest_framework import filters
 from rest_framework.filters import BaseFilterBackend
 from datetime import datetime
 from django.db.models import Q
+from .permissions import VenuePermissions
+from rest_framework.authentication import TokenAuthentication
 
 class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -31,8 +31,8 @@ class BookingsRangeFilterBackend(BaseFilterBackend):
         return queryset
 
 class VenueViewset(viewsets.ViewSet):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [UserPermissions]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [VenuePermissions]
     parser_class = [MultiPartParser, FormParser]
 
     # For filter/search
@@ -80,13 +80,12 @@ class VenueViewset(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, context={'request': request})
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -95,7 +94,7 @@ class VenueViewset(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -104,7 +103,6 @@ class VenueViewset(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
-        # Deleting the associated user deletes the profile automatically
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

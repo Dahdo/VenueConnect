@@ -1,29 +1,29 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Booking
-from .serializers import BookingSerializer
+from .models import Bookings
+from .serializers import BookingsSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
-class UserBookingListView(APIView): # Get all for a specific user
+class UserBookingsListView(APIView): # Get all for a specific user
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        bookings = Booking.objects.filter(user_id=user_id)
-        serializer = BookingSerializer(bookings, many=True)
+        bookings = Bookings.objects.filter(user_id=user_id)
+        serializer = BookingsSerializer(bookings, many=True)
         return Response(serializer.data)
     
-class BookingListView(APIView): # for all users
+class BookingsListView(APIView): # for all users
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        bookings = Booking.objects.all()
-        serializer = BookingSerializer(bookings, many=True)
+        bookings = Bookings.objects.all()
+        serializer = BookingsSerializer(bookings, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = BookingSerializer(data=request.data)
+        serializer = BookingsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -31,24 +31,24 @@ class BookingListView(APIView): # for all users
     
 
 from django.http import Http404 
-class BookingDetailView(APIView):  # for a specific user and booking
+class BookingDetailView(APIView):  # for a specific user and bookings
     permission_classes = [IsAuthenticated]
     def get(self, request, user_id, booking_id):
         try:
-            booking = Booking.objects.get(user_id=user_id, id=booking_id)
-        except Booking.DoesNotExist:
-            raise Http404("Booking does not exist")
+            bookings = Bookings.objects.get(user_id=user_id, id=booking_id)
+        except Bookings.DoesNotExist:
+            raise Http404("bookings does not exist")
 
-        serializer = BookingSerializer(booking)
+        serializer = BookingsSerializer(bookings)
         return Response(serializer.data)
 
     def put(self, request, user_id, booking_id):
         try:
-            booking = Booking.objects.get(user_id=user_id, id=booking_id)
-        except Booking.DoesNotExist:
-            raise Http404("Booking does not exist")
+            bookings = Bookings.objects.get(user_id=user_id, id=booking_id)
+        except Bookings.DoesNotExist:
+            raise Http404("bookings does not exist")
 
-        serializer = BookingSerializer(booking, data=request.data)
+        serializer = BookingsSerializer(bookings, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -56,30 +56,30 @@ class BookingDetailView(APIView):  # for a specific user and booking
 
 
 
-class BookingCancelView(APIView):
+class BookingsCancelView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, booking_id):
-        booking = get_object_or_404(Booking, pk=booking_id)
-        booking.state = 'cancelled'
-        booking.save()
-        serializer = BookingSerializer(booking)
+        bookings = get_object_or_404(Bookings, pk=booking_id)
+        bookings.state = 'cancelled'
+        bookings.save()
+        serializer = BookingsSerializer(bookings)
         return Response(serializer.data)
 
-class BookingCompleteView(APIView):
+class BookingsCompleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, booking_id):
-        booking = get_object_or_404(Booking, pk=booking_id)
-        booking.state = 'completed'
-        booking.save()
-        serializer = BookingSerializer(booking)
+        bookings = get_object_or_404(Bookings, pk=booking_id)
+        bookings.state = 'completed'
+        bookings.save()
+        serializer = BookingsSerializer(bookings)
         return Response(serializer.data)
     
 class BookingDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     
     def delete(self, request, booking_id):
-        booking = get_object_or_404(Booking, pk=booking_id)
-        booking.delete()
+        bookings = get_object_or_404(Bookings, pk=booking_id)
+        bookings.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

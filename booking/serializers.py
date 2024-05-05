@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from .models import Booking
+from .models import Bookings
 from venues.models import Venue
 from users.models import CustomUser
 
 
-class BookingSerializer(serializers.ModelSerializer):
+class BookingsSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField()
     venue_id = serializers.IntegerField()
 
     class Meta:
-        model = Booking
+        model = Bookings
         fields = ['id', 'user_id', 'venue_id', 'state', 'check_in', 'check_out']
         read_only_filds = ['id']
 
@@ -18,5 +18,5 @@ class BookingSerializer(serializers.ModelSerializer):
         venue_id = validated_data.pop('venue_id')
         user = CustomUser.objects.get(id=user_id)
         venue = Venue.objects.get(id=venue_id)
-        booking = Booking.objects.create(user=user, venue=venue, **validated_data)
-        return booking
+        bookings = Bookings.objects.create(user=user, venue=venue, **validated_data)
+        return bookings

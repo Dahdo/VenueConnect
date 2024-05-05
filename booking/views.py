@@ -37,7 +37,7 @@ class BookingDetailView(APIView):  # for a specific user and bookings
         try:
             bookings = Bookings.objects.get(user_id=user_id, id=booking_id)
         except Bookings.DoesNotExist:
-            raise Http404("bookings does not exist")
+            raise Http404("booking does not exist")
 
         serializer = BookingsSerializer(bookings)
         return Response(serializer.data)
@@ -46,7 +46,7 @@ class BookingDetailView(APIView):  # for a specific user and bookings
         try:
             bookings = Bookings.objects.get(user_id=user_id, id=booking_id)
         except Bookings.DoesNotExist:
-            raise Http404("bookings does not exist")
+            raise Http404("booking does not exist")
 
         serializer = BookingsSerializer(bookings, data=request.data)
         if serializer.is_valid():

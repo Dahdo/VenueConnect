@@ -16,16 +16,16 @@ from rest_framework.authentication import TokenAuthentication
 
 class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        start_time = request.query_params.get('start_time')
-        end_time = request.query_params.get('end_time')
+        check_in = request.query_params.get('check_in')
+        check_out = request.query_params.get('check_out')
 
-        if start_time and end_time:
-            start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-            end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
+        if check_in and check_out:
+            check_in_datetime = datetime.strptime(check_in, '%Y-%m-%dT%H:%M:%S')
+            check_out_datetime = datetime.strptime(check_out, '%Y-%m-%dT%H:%M:%S')
             queryset = queryset.filter(
-                ~Q(bookings__start_time__lte=start_datetime, bookings__end_time__lte=end_datetime) |
-                ~Q(bookings__start_time__gte=start_datetime, bookings__end_time__gte=end_datetime) |
-                ~Q(bookings__start_time__lte=start_datetime, bookings__end_time__gte=end_datetime) 
+                ~Q(bookings__check_in__lte=check_in_datetime, bookings__check_out__lte=check_out_datetime) |
+                ~Q(bookings__check_in__gte=check_in_datetime, bookings__check_out__gte=check_out_datetime) |
+                ~Q(bookings__check_in__lte=check_in_datetime, bookings__check_out__gte=check_out_datetime) 
             )
 
         return queryset

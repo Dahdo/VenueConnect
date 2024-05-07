@@ -28,7 +28,11 @@ class VenueSerializer(serializers.ModelSerializer):
         return [request.build_absolute_uri(image.image.url) for image in obj.images.all()]
 
     def get_bookings(self, obj):
-        return [{"check_in": booking.check_in, "check_out": booking.check_out} for booking in obj.bookings.all()]
+        return [
+            {"check_in": booking.check_in, "check_out": booking.check_out} 
+            for booking in obj.bookings.all()
+            if booking.state == 'active'
+            ]
 
     
     def create(self, validated_data):

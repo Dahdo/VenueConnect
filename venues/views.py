@@ -22,10 +22,10 @@ class BookingsRangeFilterBackend(BaseFilterBackend):
         if check_in and check_out:
             check_in_datetime = datetime.strptime(check_in, '%Y-%m-%dT%H:%M:%S')
             check_out_datetime = datetime.strptime(check_out, '%Y-%m-%dT%H:%M:%S')
-            queryset = queryset.filter(
-                ~Q(bookings__check_in__lte=check_in_datetime, bookings__check_out__lte=check_out_datetime) |
-                ~Q(bookings__check_in__gte=check_in_datetime, bookings__check_out__gte=check_out_datetime) |
-                ~Q(bookings__check_in__lte=check_in_datetime, bookings__check_out__gte=check_out_datetime) 
+            queryset = queryset.exclude(
+                bookings__check_in__lt=check_out_datetime,
+                bookings__check_out__gt=check_in_datetime,
+                bookings__state='active'
             )
 
         return queryset

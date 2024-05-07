@@ -1,6 +1,9 @@
 from django.db import models
 from users.models import CustomUser
 from venues.models import Venue
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 class Bookings(models.Model):
     STATE_CHOICES = (
@@ -21,3 +24,11 @@ class Bookings(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.venue.name} - {self.check_in} to {self.check_out}"
+
+@receiver(post_save, sender=Bookings)
+def update_booking_state(sender, instance, **kwargs):
+    # Check if the booking's state is 'active' and the check_out time has passed
+    if instance.state == 'active' and instance.check_out <= timezone.now():
+        # Update the state to 'completed'
+        instance.state = 'completed'
+        instance.save(update_fields=['state'])

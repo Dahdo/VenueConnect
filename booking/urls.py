@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserBookingsListView, BookingsListView, BookingDetailView, BookingsCancelView, BookingsCompleteView, BookingDeleteView
+from .views import UserBookingsListView, BookingsListView, BookingDetailView, BookingsCancelView, BookingsCompleteView, BookingDeleteView, BookingsActivateView
 
 urlpatterns = [
     # Endpoint to get all bookings for a specific user
@@ -16,6 +16,9 @@ urlpatterns = [
 
     # Endpoint to mark a specific bookings as completed
     path('bookings/<int:booking_id>/complete/', BookingsCompleteView.as_view(), name='bookings-complete'),
+
+    # Endpoint to mark a specific bookings as active
+    path('bookings/<int:booking_id>/activate/', BookingsActivateView.as_view(), name='bookings-activate'),
 
     # Endpoint to delete a specific bookings (need to be an admin)
     path('bookings/<int:booking_id>/delete/', BookingDeleteView.as_view(), name='bookings-delete')

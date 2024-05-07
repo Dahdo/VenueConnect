@@ -5,6 +5,7 @@ from .models import Bookings
 from .serializers import BookingsSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.core.exceptions import ValidationError
 
 class UserBookingsListView(APIView): # Get all for a specific user
     permission_classes = [IsAuthenticated]
@@ -21,14 +22,16 @@ class BookingsListView(APIView): # for all users
         bookings = Bookings.objects.all()
         serializer = BookingsSerializer(bookings, many=True)
         return Response(serializer.data)
-
+    
     def post(self, request):
         serializer = BookingsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except ValidationError as e:
+                return Response(e, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 from django.http import Http404 
 class BookingDetailView(APIView):  # for a specific user and bookings
@@ -72,6 +75,16 @@ class BookingsCompleteView(APIView):
     def put(self, request, booking_id):
         bookings = get_object_or_404(Bookings, pk=booking_id)
         bookings.state = 'completed'
+        bookings.save()
+        serializer = BookingsSerializer(bookings)
+        return Response(serializer.data)
+
+class BookingsActivateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, booking_id):
+        bookings = get_object_or_404(Bookings, pk=booking_id)
+        bookings.state = 'active'
         bookings.save()
         serializer = BookingsSerializer(bookings)
         return Response(serializer.data)

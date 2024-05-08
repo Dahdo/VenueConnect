@@ -1,8 +1,6 @@
 from rest_framework import status
 from django.http import Http404
 from rest_framework.response import Response
-from rest_framework import permissions
-from rest_framework.authtoken.models import Token
 from venues.serializers import VenueSerializer
 from rest_framework import viewsets
 from venues.models import Venue
@@ -13,30 +11,32 @@ from rest_framework import filters
 from rest_framework.filters import BaseFilterBackend
 from datetime import datetime
 from django.db.models import Q
+from .permissions import VenuePermissions
+from rest_framework.authentication import TokenAuthentication
 
-class AvailabilityRangeFilterBackend(BaseFilterBackend):
+class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        start_time = request.query_params.get('start_time')
-        end_time = request.query_params.get('end_time')
+        check_in = request.query_params.get('check_in')
+        check_out = request.query_params.get('check_out')
 
-        if start_time and end_time:
-            start_datetime = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-            end_datetime = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
-            queryset = queryset.filter(
-                ~Q(availability__start_time__lte=start_datetime, availability__end_time__lte=end_datetime) |
-                ~Q(availability__start_time__gte=start_datetime, availability__end_time__gte=end_datetime) |
-                ~Q(availability__start_time__lte=start_datetime, availability__end_time__gte=end_datetime) 
+        if check_in and check_out:
+            check_in_datetime = datetime.strptime(check_in, '%Y-%m-%dT%H:%M:%S')
+            check_out_datetime = datetime.strptime(check_out, '%Y-%m-%dT%H:%M:%S')
+            queryset = queryset.exclude(
+                bookings__check_in__lt=check_out_datetime,
+                bookings__check_out__gt=check_in_datetime,
+                bookings__state='active'
             )
 
         return queryset
 
 class VenueViewset(viewsets.ViewSet):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [UserPermissions]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [VenuePermissions]
     parser_class = [MultiPartParser, FormParser]
 
     # For filter/search
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, AvailabilityRangeFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter, BookingsRangeFilterBackend]
     filterset_fields = {
         'price': ['gte', 'lte'],
         'capacity': ['gte', 'lte'],
@@ -80,13 +80,12 @@ class VenueViewset(viewsets.ViewSet):
     
     def retrieve(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, context={'request': request})
         return Response(serializer.data)
 
     def update(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -95,7 +94,7 @@ class VenueViewset(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         serializer = VenueSerializer(venue, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
@@ -104,7 +103,6 @@ class VenueViewset(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         venue = self.get_object(pk)
-        # self.check_object_permissions(request, venue) # Enforce object level permissions checking
-        # Deleting the associated user deletes the profile automatically
+        self.check_object_permissions(request, venue) # Enforce object level permissions checking
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

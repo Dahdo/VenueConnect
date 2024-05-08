@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     # Local apps
     'users',
-    'venues'
+    'venues',
+    'booking',
 ]
 
 MIDDLEWARE = [
@@ -100,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 

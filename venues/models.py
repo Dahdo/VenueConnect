@@ -41,18 +41,6 @@ class Venue(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-class VenueAvailability(models.Model):
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE, related_name='availability')
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.venue.name} availability"
-
 def image_upload_to(instance, filename):
     ext = filename.split('.')[-1]
     filename = f"venue_{instance.venue.id}_{uuid4()}.{ext}"

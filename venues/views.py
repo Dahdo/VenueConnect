@@ -13,6 +13,7 @@ from datetime import datetime
 from django.db.models import Q
 from .permissions import VenuePermissions
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 
 class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -106,3 +107,12 @@ class VenueViewset(viewsets.ViewSet):
         self.check_object_permissions(request, venue) # Enforce object level permissions checking
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=False, methods=['get'], url_path='(?P<owner_id>[^/.]+)')
+    def list_by_owner(self, request, owner_id=None):
+        venues = Venue.objects.filter(owner_id=owner_id)
+        paginator = PageNumberPagination()
+        paginator.page_size = 12
+        venues_page = paginator.paginate_queryset(venues, request)
+        serializer = VenueSerializer(venues_page, context={'request': request}, many=True)
+        return paginator.get_paginated_response(serializer.data)

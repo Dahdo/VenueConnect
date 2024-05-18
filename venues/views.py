@@ -108,7 +108,7 @@ class VenueViewset(viewsets.ViewSet):
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(detail=False, methods=['get'], url_path='(?P<owner_id>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='owner/(?P<owner_id>[^/.]+)')
     def list_by_owner(self, request, owner_id=None):
         venues = Venue.objects.filter(owner_id=owner_id)
         paginator = PageNumberPagination()

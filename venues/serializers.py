@@ -20,7 +20,7 @@ class VenueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Venue
-        fields = ['id', 'owner_id', 'name', 'description', 'price', 'pricing_unit',
+        fields = ['id', 'owner_id', 'name', 'description', 'price',
                    'capacity', 'rating', 'bookings', 'city', 'street', 
                    'postal_code', 'latitude', 'longitude', 'images','upload_images' ]
         
@@ -43,12 +43,10 @@ class VenueSerializer(serializers.ModelSerializer):
         name_data = validated_data.pop('name')
         description_data = validated_data.pop('description')
         price_data = validated_data.pop('price')
-        pricing_unit_data = validated_data.pop('pricing_unit')
         capacity_data = validated_data.pop('capacity')
         rating_data = validated_data.pop('rating')
         user = self.context['request'].user
-        venue = Venue.objects.create(name=name_data, description=description_data, price=price_data, owner=user,
-                                     pricing_unit=pricing_unit_data, capacity=capacity_data, rating=rating_data)
+        venue = Venue.objects.create(name=name_data, description=description_data, price=price_data, owner=user, capacity=capacity_data, rating=rating_data)
         venue.save()
         for image in uploaded_images:
             VenueImages.objects.create(venue=venue, image=image)
@@ -81,7 +79,6 @@ class VenueSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.price = validated_data.get('price', instance.price)
-        instance.pricing_unit = validated_data.get('pricing_unit', instance.pricing_unit)
         instance.capacity = validated_data.get('capacity', instance.capacity)
         instance.rating = validated_data.get('rating', instance.rating)
         instance.rating_count = validated_data.get('rating_count', instance.rating_count)

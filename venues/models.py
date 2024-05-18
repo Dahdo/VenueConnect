@@ -32,7 +32,6 @@ class Venue(models.Model):
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(CustomUser, related_name='venue', on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    pricing_unit = models.CharField(max_length=10, choices=PRICING_CHOICES, default='day')
     capacity = models.IntegerField()
     rating = models.DecimalField(max_digits=3, decimal_places=1, default=5)
     rating_count = models.IntegerField(null=True, blank=True)

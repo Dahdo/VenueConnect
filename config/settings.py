@@ -177,3 +177,8 @@ if IS_HEROKU_APP:
     AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'public-read')
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_SIGNATURE_VERSION = "s3v4"
+
+    # Cron jobs
+    CRONJOBS = [
+        ('0 * * * *', 'booking.cron.update_bookings_state'),  # Runs every hour
+    ]

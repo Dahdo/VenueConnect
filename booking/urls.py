@@ -1,6 +1,15 @@
 from django.urls import path
 from .views import *
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'reviews', ReviewViewSet)
+
 urlpatterns = [
+    # Include the review endpoints from the router
+    path('', include(router.urls)),
+
     # Endpoint to get all bookings for a specific user
     path('bookings/user/<int:user_id>/', UserBookingsListView.as_view(), name='user-bookings-list'),
 

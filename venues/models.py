@@ -3,6 +3,7 @@ from users.models import CustomUser
 from uuid import uuid4
 import os
 
+
 class Address(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True)
     street = models.CharField(max_length=100, blank=True, null=True)
@@ -32,6 +33,10 @@ class Venue(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def get_reviews(self):
+        from booking.models import Review
+        return Review.objects.filter(booking__venue=self)
 
 def image_upload_to(instance, filename):
     ext = filename.split('.')[-1]

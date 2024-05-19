@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
+    'django_crontab',
     # Local apps
     'users',
     'venues',
@@ -142,3 +143,8 @@ SWAGGER_SETTINGS = {
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+# Cron jobs
+CRONJOBS = [
+    ('0 * * * *', 'booking.cron.update_bookings_state'),  # Runs every hour
+]

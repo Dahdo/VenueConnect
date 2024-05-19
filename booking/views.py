@@ -6,6 +6,8 @@ from .serializers import BookingsSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.core.exceptions import ValidationError
+from venues.models import Venue
+from venues.serializers import VenueSerializer
 
 class UserBookingsListView(APIView): # Get all for a specific user
     permission_classes = [IsAuthenticated]
@@ -96,3 +98,55 @@ class BookingDeleteView(APIView):
         bookings = get_object_or_404(Bookings, pk=booking_id)
         bookings.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class OwnerVenueBookings(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, venue_owner_id):
+        venues = Venue.objects.filter(owner_id=venue_owner_id)
+        results = {}
+        for venue in venues:
+            bookings = Bookings.objects.filter(venue_id=venue.id)
+            if bookings.exists():
+                bookings_serializer = BookingsSerializer(bookings, many=True)
+                results[venue.id] = bookings_serializer.data
+        return Response(results)
+
+class OwnerVenueBookingsCancelled(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, venue_owner_id):
+        venues = Venue.objects.filter(owner_id=venue_owner_id)
+        results = {}
+        for venue in venues:
+            bookings = Bookings.objects.filter(venue_id=venue.id, state='cancelled')
+            if bookings.exists():
+                bookings_serializer = BookingsSerializer(bookings, many=True)
+                results[venue.id] = bookings_serializer.data
+        return Response(results)
+
+class OwnerVenueBookingsActive(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, venue_owner_id):
+        venues = Venue.objects.filter(owner_id=venue_owner_id)
+        results = {}
+        for venue in venues:
+            bookings = Bookings.objects.filter(venue_id=venue.id, state='active')
+            if bookings.exists():
+                bookings_serializer = BookingsSerializer(bookings, many=True)
+                results[venue.id] = bookings_serializer.data
+        return Response(results)
+
+class OwnerVenueBookingsCompleted(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, venue_owner_id):
+        venues = Venue.objects.filter(owner_id=venue_owner_id)
+        results = {}
+        for venue in venues:
+            bookings = Bookings.objects.filter(venue_id=venue.id, state='completed')
+            if bookings.exists():
+                bookings_serializer = BookingsSerializer(bookings, many=True)
+                results[venue.id] = bookings_serializer.data
+        return Response(results)

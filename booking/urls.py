@@ -1,6 +1,5 @@
 from django.urls import path
-from .views import UserBookingsListView, BookingsListView, BookingDetailView, BookingsCancelView, BookingsCompleteView, BookingDeleteView, BookingsActivateView
-
+from .views import *
 urlpatterns = [
     # Endpoint to get all bookings for a specific user
     path('bookings/user/<int:user_id>/', UserBookingsListView.as_view(), name='user-bookings-list'),
@@ -21,5 +20,17 @@ urlpatterns = [
     path('bookings/<int:booking_id>/activate/', BookingsActivateView.as_view(), name='bookings-activate'),
 
     # Endpoint to delete a specific bookings (need to be an admin)
-    path('bookings/<int:booking_id>/delete/', BookingDeleteView.as_view(), name='bookings-delete')
+    path('bookings/<int:booking_id>/delete/', BookingDeleteView.as_view(), name='bookings-delete'),
+
+    # Endpoint to retrieve all venue owner's booking grouped by venues
+    path('bookings/venue-owner/<int:venue_owner_id>/', OwnerVenueBookings.as_view(), name='bookings-owner'),
+
+    # Endpoint to retrieve all active venue owner's booking grouped by venues
+    path('bookings/venue-owner/<int:venue_owner_id>/active/', OwnerVenueBookingsActive.as_view(), name='bookings-owner-active'),
+
+     # Endpoint to retrieve all cancelled venue owner's booking grouped by venues
+    path('bookings/venue-owner/<int:venue_owner_id>/cancelled/', OwnerVenueBookingsCancelled.as_view(), name='bookings-owner-cancelled'),
+
+     # Endpoint to retrieve all completed venue owner's booking grouped by venues
+    path('bookings/venue-owner/<int:venue_owner_id>/completed/', OwnerVenueBookingsCompleted.as_view(), name='bookings-owner-completed'),
 ]

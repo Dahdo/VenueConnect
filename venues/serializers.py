@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from venues.models import Venue, VenueImages, Address
 from booking.serializers import BookingsSerializer
-from booking.models import Bookings
+from booking.serializers import ReviewSerializer
 
 class VenueSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField(read_only=True)
@@ -10,6 +10,7 @@ class VenueSerializer(serializers.ModelSerializer):
         child=serializers.ImageField(allow_empty_file=False, write_only=True, use_url=False),
         required=False
     )
+    reviews = serializers.SerializerMethodField(read_only=True)
 
     city = serializers.CharField(source='address.city', allow_null=True)
     street = serializers.CharField(source='address.street', allow_null=True)
@@ -22,7 +23,7 @@ class VenueSerializer(serializers.ModelSerializer):
         model = Venue
         fields = ['id', 'owner_id', 'name', 'description', 'price',
                    'capacity', 'rating', 'bookings', 'city', 'street', 
-                   'postal_code', 'latitude', 'longitude', 'images','upload_images' ]
+                   'postal_code', 'latitude', 'longitude', 'images','upload_images', 'reviews']
         
     def get_images(self, obj):
         request = self.context.get('request')
@@ -34,6 +35,10 @@ class VenueSerializer(serializers.ModelSerializer):
             for booking in obj.bookings.all()
             if booking.state == 'active'
             ]
+    
+    def get_reviews(self, obj):
+        reviews = obj.get_reviews()
+        return ReviewSerializer(reviews, many=True).data
 
     
     def create(self, validated_data):

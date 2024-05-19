@@ -7,7 +7,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.core.exceptions import ValidationError
 from venues.models import Venue
-from venues.serializers import VenueSerializer
+from rest_framework import viewsets
+from .models import Review
+from .serializers import ReviewSerializer
 
 class UserBookingsListView(APIView): # Get all for a specific user
     permission_classes = [IsAuthenticated]
@@ -150,3 +152,10 @@ class OwnerVenueBookingsCompleted(APIView):
                 bookings_serializer = BookingsSerializer(bookings, many=True)
                 results[venue.id] = bookings_serializer.data
         return Response(results)
+
+# Review
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]

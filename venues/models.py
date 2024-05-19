@@ -21,13 +21,6 @@ class Address(models.Model):
 
 
 class Venue(models.Model):
-    PRICING_CHOICES = (
-        ('hour', 'Per Hour'),
-        ('day', 'Per Day'),
-        ('week', 'Per Week'),
-        ('month', 'Per Month'),
-        ('year', 'Per Year')
-    )
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(CustomUser, related_name='venue', on_delete=models.CASCADE, null=True, blank=True)

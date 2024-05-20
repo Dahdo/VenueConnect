@@ -7,11 +7,17 @@ from django.core.exceptions import ValidationError
 
 class ReviewSerializer(serializers.ModelSerializer):
     booking_id = serializers.IntegerField()
+    user_id = serializers.IntegerField(read_only=True, source='booking.user.id')
 
     class Meta:
         model = Review
-        fields = ['id', 'booking_id', 'rating', 'comment']
-        read_only_fields = ['id']
+        fields = ['id', 'booking_id', 'user_id', 'rating', 'comment']
+        read_only_fields = ['id', 'user_id']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user_id'] = instance.booking.user.id
+        return representation
 
     def create(self, validated_data):
         booking_id = validated_data.pop('booking_id')

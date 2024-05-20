@@ -14,6 +14,7 @@ from django.db.models import Q
 from .permissions import VenuePermissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 class BookingsRangeFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -108,7 +109,7 @@ class VenueViewset(viewsets.ViewSet):
         venue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(detail=False, methods=['get'], url_path='owner/(?P<owner_id>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='owner/(?P<owner_id>[^/.]+)', permission_classes = [IsAuthenticated])
     def list_by_owner(self, request, owner_id=None):
         venues = Venue.objects.filter(owner_id=owner_id)
         paginator = PageNumberPagination()

@@ -75,7 +75,7 @@ class BookingsSerializer(serializers.ModelSerializer):
         else:
             # Calculate the total price
             duration = check_out - check_in
-            if not total_price:
+            if total_price is None or total_price == '':
                 total_price = duration.days * venue.price
             # Create new booking
             booking = Bookings.objects.create(user=user, venue=venue, number_of_guests=number_of_guests,state=state,

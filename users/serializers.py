@@ -99,3 +99,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
+class CustomUserSerializer(serializers.ModelSerializer): # Only to be used in venue to get owner details
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'email']

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from venues.models import Venue, VenueImages, Address
-from booking.serializers import BookingsSerializer
+from users.serializers import CustomUserSerializer
 from booking.serializers import ReviewSerializer
 
 class VenueSerializer(serializers.ModelSerializer):
@@ -17,11 +17,11 @@ class VenueSerializer(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='address.postal_code', allow_null=True)
     latitude = serializers.DecimalField(source='address.latitude', max_digits=9, decimal_places=6, allow_null=True)
     longitude = serializers.DecimalField(source='address.longitude', max_digits=9, decimal_places=6, allow_null=True)
-    owner_id = serializers.IntegerField(source='owner.id', read_only=True, allow_null=True)
+    owner = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Venue
-        fields = ['id', 'owner_id', 'name', 'description', 'price',
+        fields = ['id', 'owner', 'name', 'description', 'price',
                    'capacity', 'rating', 'bookings', 'city', 'street', 
                    'postal_code', 'latitude', 'longitude', 'images','upload_images', 'reviews']
         

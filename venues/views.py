@@ -46,7 +46,7 @@ class VenueViewset(viewsets.ViewSet):
         'address__city': ['exact']
     }
     search_fields = ['name', 'description', 'address__city']
-    ordering_fields = ['price', 'rating']
+    ordering_fields = ['price', 'rating', 'capacity']
 
     
     def filter_queryset(self, queryset):

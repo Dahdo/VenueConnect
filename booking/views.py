@@ -103,28 +103,35 @@ class BookingDeleteView(APIView):
     
 class OwnerVenueBookings(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     def get(self, request, venue_owner_id):
         venues = Venue.objects.filter(owner_id=venue_owner_id)
-        results = {}
+        results = []
         for venue in venues:
             bookings = Bookings.objects.filter(venue_id=venue.id)
             if bookings.exists():
                 bookings_serializer = BookingsSerializer(bookings, many=True)
-                results[venue.id] = bookings_serializer.data
+                results.append({
+                    'venue_id': venue.id,
+                    'bookings': bookings_serializer.data
+                })
         return Response(results)
+
 
 class OwnerVenueBookingsCancelled(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, venue_owner_id):
         venues = Venue.objects.filter(owner_id=venue_owner_id)
-        results = {}
+        results = []
         for venue in venues:
             bookings = Bookings.objects.filter(venue_id=venue.id, state='cancelled')
             if bookings.exists():
                 bookings_serializer = BookingsSerializer(bookings, many=True)
-                results[venue.id] = bookings_serializer.data
+                results.append({
+                    'venue_id': venue.id,
+                    'bookings': bookings_serializer.data
+                })
         return Response(results)
 
 class OwnerVenueBookingsActive(APIView):
@@ -132,12 +139,15 @@ class OwnerVenueBookingsActive(APIView):
 
     def get(self, request, venue_owner_id):
         venues = Venue.objects.filter(owner_id=venue_owner_id)
-        results = {}
+        results = []
         for venue in venues:
             bookings = Bookings.objects.filter(venue_id=venue.id, state='active')
             if bookings.exists():
                 bookings_serializer = BookingsSerializer(bookings, many=True)
-                results[venue.id] = bookings_serializer.data
+                results.append({
+                    'venue_id': venue.id,
+                    'bookings': bookings_serializer.data
+                })
         return Response(results)
 
 class OwnerVenueBookingsCompleted(APIView):
@@ -145,12 +155,15 @@ class OwnerVenueBookingsCompleted(APIView):
 
     def get(self, request, venue_owner_id):
         venues = Venue.objects.filter(owner_id=venue_owner_id)
-        results = {}
+        results = []
         for venue in venues:
             bookings = Bookings.objects.filter(venue_id=venue.id, state='completed')
             if bookings.exists():
                 bookings_serializer = BookingsSerializer(bookings, many=True)
-                results[venue.id] = bookings_serializer.data
+                results.append({
+                    'venue_id': venue.id,
+                    'bookings': bookings_serializer.data
+                })
         return Response(results)
 
 # Review

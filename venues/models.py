@@ -5,6 +5,7 @@ import os
 
 
 class Address(models.Model):
+    country = models.CharField(max_length=100, default='Poland')
     city = models.CharField(max_length=100, blank=True, null=True)
     street = models.CharField(max_length=100, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)

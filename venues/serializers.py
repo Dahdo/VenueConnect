@@ -12,6 +12,7 @@ class VenueSerializer(serializers.ModelSerializer):
     )
     reviews = serializers.SerializerMethodField(read_only=True)
 
+    country = serializers.CharField(source='address.country', allow_null=True)
     city = serializers.CharField(source='address.city', allow_null=True)
     street = serializers.CharField(source='address.street', allow_null=True)
     postal_code = serializers.CharField(source='address.postal_code', allow_null=True)
@@ -22,7 +23,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = ['id', 'owner', 'name', 'description', 'price',
-                   'capacity', 'rating', 'bookings', 'city', 'street', 
+                   'capacity', 'rating', 'bookings', 'country', 'city', 'street', 
                    'postal_code', 'latitude', 'longitude', 'images','upload_images', 'reviews']
         
     def get_images(self, obj):
@@ -74,6 +75,7 @@ class VenueSerializer(serializers.ModelSerializer):
         address = instance.address
 
         if address_data:
+            address.country = address_data.get('country', address.country)
             address.city = address_data.get('city', address.city)
             address.street = address_data.get('street', address.street)
             address.postal_code = address_data.get('postal_code', address.postal_code)
